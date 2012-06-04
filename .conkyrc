@@ -1,0 +1,77 @@
+update_interval 1.0        # 更新时间间隔
+double_buffer yes        # 双缓存，解决Conky闪烁问题
+use_xft yes                # 自定义字体
+xftfont DejaVu Sans Mono:size=10
+background true
+
+gap_x 20
+gap_y 0
+maximum_width 300        # Conky最大宽度像素值
+default_color gray        # Conky默认颜色
+alignment top_right        # Conky默认位置
+#draw_outline yes        # 绘制文本、图案的轮廓线
+
+# 解决Conky和桌面图标的冲突问题
+own_window yes
+own_window_type normal
+own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
+own_window_transparent yes
+
+TEXT
+# 系统信息总览
+${color white}${font :bold:size=12}SYSTEM $font$color $alignr$time
+Hostname: $alignr $nodename
+Kernel: $alignr $kernel
+Uptime: $alignr $color $uptime
+System load: $alignr $loadavg
+Running Processes: $alignr $running_processes/$processes
+Running Threads: $alignr $running_threads/$threads
+# 显示当前四核CPU的频率、使用率的数值和示意图
+$font$color
+IGD:(${execpi 8 sensors | grep 'crit' | grep 'temp1' | cut --characters 14-22}) DIS:(${execpi 8 sensors | grep 'temp1' |grep -v 'crit' |  cut --characters 14-22}) 
+CPU0:(${execpi 8 sensors | grep 'Core 0' | cut --characters 17-24}) CPU1:(${execpi 8 sensors | grep 'Core 1' | cut --characters 17-24})
+CPU2:(${execpi 8 sensors | grep 'Core 2' | cut --characters 17-24}) CPU3:(${execpi 8 sensors | grep 'Core 3' | cut --characters 17-24})
+CPU0: ${freq_g 1}GHz (${cpu cpu1}%) ${alignr 100}${cpubar cpu1}
+CPU1: ${freq_g 2}GHz (${cpu cpu2}%) ${alignr 100}${cpubar cpu2}
+CPU2: ${freq_g 3}GHz (${cpu cpu3}%) ${alignr 100}${cpubar cpu3}
+CPU3: ${freq_g 4}GHz (${cpu cpu4}%) ${alignr 100}${cpubar cpu4}
+
+# 列出排名前五的CPU消耗进程
+${color white}${font :bold:size=12}PROCESSORS 
+${font :bold:size=9}Name $alignc PID $alignr CPU $font
+${top name 1} $alignc ${top pid 1} $alignr ${top cpu 1}%
+${top name 2} $alignc ${top pid 2} $alignr ${top cpu 2}%
+${top name 3} $alignc ${top pid 3} $alignr ${top cpu 3}%
+${top name 4} $alignc ${top pid 4} $alignr ${top cpu 4}%
+${top name 5} $alignc ${top pid 5} $alignr ${top cpu 5}%
+
+# 显示计算机当前内存的使用情况
+${color white}${font :bold:size=12}MEMORY $font$color $mem/$memmax - $memperc%
+${membar}
+# 列出排名前五的内存消耗进程
+${font :bold:size=9}Name $alignc PID $alignr RAM $font
+${top_mem name 1} $alignc ${top_mem pid 1} $alignr ${top_mem mem 1}%
+${top_mem name 2} $alignc ${top_mem pid 2} $alignr ${top_mem mem 2}%
+${top_mem name 3} $alignc ${top_mem pid 3} $alignr ${top_mem mem 3}%
+${top_mem name 4} $alignc ${top_mem pid 4} $alignr ${top_mem mem 4}%
+${top_mem name 5} $alignc ${top_mem pid 5} $alignr ${top_mem mem 5}%
+
+# 显示磁盘的使用情况，并且显示磁盘使用示意图
+# 因为只分有两个区，所以只显示/和/home的磁盘使用情况
+${color white}${font :bold:size=12}HDD $font$color
+/ $alignr ${fs_used /} of ${fs_size /} (${fs_used_perc /}%)
+${fs_bar /}
+#/home $alignr ${fs_used /home} of ${fs_size /home} (${fs_used_perc /home}%)
+#${fs_bar /home}
+swap $alignr $swap of $swapmax ($swapperc%)
+$swapbar
+
+# 显示网络使用情况
+${color white}${font :bold:size=12}NETWORK $font$color
+eth0 IP : $alignr${addr eth0}
+Download: $alignr ${downspeed eth0}/s
+Upload: $alignr ${upspeed eth0}/s
+
+wlan0 IP : $alignr${addr wlan0}
+Download: $alignr ${downspeed wlan0}/s
+Upload: $alignr ${upspeed wlan0}/s
