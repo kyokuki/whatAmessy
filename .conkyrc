@@ -1,34 +1,35 @@
-update_interval 1.0        # 更新时间间隔
-double_buffer yes        # 双缓存，解决Conky闪烁问题
-use_xft yes                # 自定义字体
+update_interval 1.0 # 更新时间间隔
+double_buffer yes # 双缓存，解决Conky闪烁问题
+use_xft yes # 自定义字体
 xftfont DejaVu Sans Mono:size=10
 background true
 
-gap_x 20
-gap_y 0
-maximum_width 300        # Conky最大宽度像素值
-default_color gray        # Conky默认颜色
-alignment top_right        # Conky默认位置
-#draw_outline yes        # 绘制文本、图案的轮廓线
+gap_x 5
+gap_y 40
+maximum_width 300 # Conky最大宽度像素值
+default_color gray # Conky默认颜色
+alignment top_right # Conky默认位置
+#draw_outline yes # 绘制文本、图案的轮廓线
 
 # 解决Conky和桌面图标的冲突问题
 own_window yes
 own_window_type normal
 own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
 own_window_transparent yes
+own_window_argb_visual true
 
 TEXT
 # 系统信息总览
 ${color white}${font :bold:size=12}SYSTEM $font$color $alignr$time
-Hostname: $alignr $nodename
-Kernel: $alignr $kernel
+#Hostname: $alignr $nodename
+#Kernel: $alignr $kernel
 Uptime: $alignr $color $uptime
 System load: $alignr $loadavg
 Running Processes: $alignr $running_processes/$processes
 Running Threads: $alignr $running_threads/$threads
 # 显示当前四核CPU的频率、使用率的数值和示意图
 $font$color
-IGD:(${execpi 8 sensors | grep 'crit' | grep 'temp1' | cut --characters 14-22}) DIS:(${execpi 8 sensors | grep 'temp1' |grep -v 'crit' |  cut --characters 14-22}) 
+IGD:(${execpi 8 sensors | grep 'crit' | grep 'temp1' | cut --characters 14-22}) DIS:(${execpi 8 sensors | grep 'temp1' |grep -v 'crit' | cut --characters 14-22})
 CPU0:(${execpi 8 sensors | grep 'Core 0' | cut --characters 17-24}) CPU1:(${execpi 8 sensors | grep 'Core 1' | cut --characters 17-24})
 CPU2:(${execpi 8 sensors | grep 'Core 2' | cut --characters 17-24}) CPU3:(${execpi 8 sensors | grep 'Core 3' | cut --characters 17-24})
 CPU0: ${freq_g 1}GHz (${cpu cpu1}%) ${alignr 100}${cpubar cpu1}
@@ -37,7 +38,7 @@ CPU2: ${freq_g 3}GHz (${cpu cpu3}%) ${alignr 100}${cpubar cpu3}
 CPU3: ${freq_g 4}GHz (${cpu cpu4}%) ${alignr 100}${cpubar cpu4}
 
 # 列出排名前五的CPU消耗进程
-${color white}${font :bold:size=12}PROCESSORS 
+${color white}${font :bold:size=12}PROCESSORS
 ${font :bold:size=9}Name $alignc PID $alignr CPU $font
 ${top name 1} $alignc ${top pid 1} $alignr ${top cpu 1}%
 ${top name 2} $alignc ${top pid 2} $alignr ${top cpu 2}%
