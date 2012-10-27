@@ -23,6 +23,7 @@ BaseSocket::~BaseSocket()
 void BaseSocket::Close()
 {
     if (m_sock != -1) {
+        shutdown(m_sock, SHUT_RDWR);
         close(m_sock);
     }
 }
@@ -40,10 +41,12 @@ bool BaseSocket::isConnected()
 bool BaseSocket::Create(bool udp)
 {
     m_udp = udp;
-    m_sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (m_sock != -1) {
-        //m_connected = true;
+    if (m_udp == false) {
+        m_sock = socket(AF_INET, SOCK_STREAM, 0);
+    } else {
+        m_sock = socket(AF_INET,SOCK_DGRAM, 0);
     }
+    
     return (m_sock != -1);
 }
 
@@ -69,7 +72,7 @@ bool BaseSocket::Bind(unsigned int port)
     return true;
 }
 
-bool BaseSocket::Listen(unsigned int timeout)
+bool BaseSocket::Listen(unsigned int timeout) const
 {
     return (listen(m_sock, timeout) >= 0);
     
@@ -125,6 +128,72 @@ bool BaseSocket::Connect(const string& host, unsigned int port)
         return false;
     }
     
+    return true;
     
 }
+
+long int BaseSocket::Send(const char* buf, int len,int flags)
+{
+    return sendto(m_sock, buf, len, flags, NULL, 0);    //is equivalent to : send(m_sock, buf, len, flags);
+}
+
+long BaseSocket::Send(const string& msg, int flags)
+{
+    return Send(msg.c_str(), msg.length()+1, flags);
+}
+
+long BaseSocket::Recv(char* buf, int len, int flags)
+{
+    return recv(m_sock, buf, len, flags);
+}
+
+string BaseSocket::Recv(int flags)
+{
+    char *buf = new char [BUF_SIZE];
+    int len =  Recv(buf, BUF_SIZE, flags);
+    string str = buf;
+    delete [] buf;
+    return (len >= 0 ? str : "");
+}
+
+long BaseSocket::SendTo(const char* buf, int len,  const string& host, int port, int flags)
+{
+    struct sockaddr_in sin;
+    socklen_t addrlen = sizeof(sin);
+    memset(&sin, 0, sizeof(sin));
+    sin.sin_family = AF_INET;
+    sin.sin_port = htons(port);
+    inet_pton(AF_INET, host.c_str(), &sin.sin_addr);
+    
+    return sendto(m_sock, buf, len, flags, (struct sockaddr*)&sin, addrlen);
+}
+
+long BaseSocket::SendTo(const string& msg, const string& host, int port, int flags)
+{
+    return SendTo(msg.c_str(), msg.length() + 1, host, port, flags);
+}
+
+
+long BaseSocket::RecvFrom(char* buf, int len, const string& host, int port, int flags)
+{
+    struct sockaddr_in sin;
+    socklen_t addrlen = sizeof(sin);
+    memset(&sin, 0, sizeof(sin));
+    sin.sin_family = AF_INET;
+    sin.sin_port = htons(port);
+    inet_pton(AF_INET, host.c_str(), &sin.sin_addr);
+    
+    return recvfrom(m_sock, buf, len, flags, (struct sockaddr*)&sin, &addrlen);
+}
+
+string BaseSocket::RecvFrom(const string& host, int port, int flags)
+{
+    char *buf = new char [BUF_SIZE];
+    int len =  RecvFrom(buf, BUF_SIZE, host, port, flags);
+    string str = buf;
+    delete [] buf;
+    return (len >= 0 ? str : "");
+}
+
+
 

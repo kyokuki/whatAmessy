@@ -2,6 +2,7 @@
 
 #include <istream>
 #include "base_socket.h"
+#include "test.h"
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -10,6 +11,7 @@ int main(int argc, char *argv[])
     BaseSocket server;
     BaseSocket client;
     
+#ifdef TEST_TCP
     if (!server.Create() || !client.Create()) {
         cerr << "server of client create error." << endl;
         return -1;
@@ -41,5 +43,22 @@ int main(int argc, char *argv[])
     
     cout << "accept from " << host << " : " << peer << endl;
     
+    cout << client.Recv() << endl;
+    cout << client.Send("this is the reply from server...") << endl;
+#endif
     
+#ifdef TEST_UDP
+    if (!server.Create(true) || !client.Create(true)) {
+        cerr << "server of client create error." << endl;
+        return -1;
+    }
+    
+    if (!server.Bind(port)) {
+        cerr << "server bind error." << endl;
+         return -1;
+    }
+    
+    cout << server.Recv();
+    
+#endif
 }
